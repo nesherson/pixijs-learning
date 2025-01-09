@@ -3,11 +3,11 @@ import { addStars } from './stars';
 import { addMoon } from './moon';
 import { addMountains } from './mountains';
 import { addTrees } from './trees';
+import { addGround } from './ground';
 
 const app = new Application();
 
-(async () =>
-{
+(async () => {
     await app.init({ background: '#021f4b', resizeTo: window });
 
     document.body.appendChild(app.canvas);
@@ -16,4 +16,5 @@ const app = new Application();
     addMoon(app);
     addMountains(app);
     addTrees(app);
+    addGround(app);
 })();
