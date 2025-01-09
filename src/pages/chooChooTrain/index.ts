@@ -1,7 +1,8 @@
 import { Application } from 'pixi.js';
 import { addStars } from './stars';
 import { addMoon } from './moon';
-import { addMountains, animateMountains } from './mountains';
+import { addMountains } from './mountains';
+import { addTrees } from './trees';
 
 const app = new Application();
 
@@ -14,8 +15,5 @@ const app = new Application();
     addStars(app);
     addMoon(app);
     addMountains(app);
- 
-    app.ticker.add((time) => {
-        animateMountains(app, time);
-    });
+    addTrees(app);
 })();

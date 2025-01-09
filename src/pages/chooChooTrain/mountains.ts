@@ -9,6 +9,19 @@ export function addMountains(app: Application) {
 
     group2.x = app.screen.width;
     app.stage.addChild(group1, group2);
+    app.ticker.add((time) => {
+        const dx = time.deltaTime * 0.5;
+
+        group1.x -= dx;
+        group2.x -= dx;
+
+        if (group1.x <= -app.screen.width) {
+            group1.x += app.screen.width * 2;
+        }
+        if (group2.x <= -app.screen.width) {
+            group2.x += app.screen.width * 2;
+        }
+    });
 }
 
 function createMountainGroup(app: Application) {
@@ -58,18 +71,4 @@ function createMountainGroup(app: Application) {
         .fill({ color: colorRight });
 
     return graphics;
-}
-
-export function animateMountains(app: Application, time: Ticker) {
-    const dx = time.deltaTime * 0.5;
-
-    group1.x -= dx;
-    group2.x -= dx;
-
-    if (group1.x <= -app.screen.width) {
-        group1.x += app.screen.width * 2;
-    }
-    if (group2.x <= -app.screen.width) {
-        group2.x += app.screen.width * 2;
-    }
 }
