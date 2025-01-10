@@ -1,16 +1,32 @@
 import { Application, Container, Graphics } from 'pixi.js';
 
-export function addTrain(app: Application, container: Container) {
+export function addTrain(app: Application, trainContainer: Container) {
     const head = createTrainHead(app);
+    const carriage = createTrainCarriage(app);
 
-    container.addChild(head);
-    app.stage.addChild(container);
+    carriage.x = -carriage.width;
+
+    trainContainer.addChild(head, carriage);
+    app.stage.addChild(trainContainer);
 
     const scale = 0.75;
 
-    container.scale.set(scale);
-    container.x = app.screen.width / 2 - head.width / 2;
-    container.y = app.screen.height - 35 - 55 * scale;
+    trainContainer.scale.set(scale);
+    trainContainer.x = app.screen.width / 2 - head.width / 2;
+
+    let elapsed = 0;
+    const shakeDistance = 3;
+    const baseY = app.screen.height - 35 - 55 * scale;
+    const speed = 0.5;
+
+    trainContainer.y = baseY;
+
+    app.ticker.add((time) => {
+        elapsed += time.deltaTime;
+        const offset = (Math.sin(elapsed * 0.5 * speed) * 0.5 + 0.5) * shakeDistance;
+
+        trainContainer.y = baseY + offset;
+    });
 }
 
 function createTrainHead(app: Application) {
@@ -128,4 +144,60 @@ function createTrainWheel(radius: number) {
             .rect(-innerRadius, -strokeThickness / 2, innerRadius * 2, strokeThickness)
             .fill({ color: 0x4f4f4f })
     );
+}
+
+function createTrainCarriage(app: Application) {
+    const container = new Container();
+
+    const containerHeight = 125;
+    const containerWidth = 200;
+    const containerRadius = 15;
+    const edgeHeight = 25;
+    const edgeExcess = 20;
+    const connectorWidth = 30;
+    const connectorHeight = 10;
+    const connectorGap = 10;
+    const connectorOffsetY = 20;
+
+    const graphics = new Graphics()
+        // Draw the body
+        .roundRect(edgeExcess / 2, -containerHeight, containerWidth, containerHeight, containerRadius)
+        .fill({ color: 0x725f19 })
+
+        // Draw the top edge
+        .rect(0, containerRadius - containerHeight - edgeHeight, containerWidth + edgeExcess, edgeHeight)
+        .fill({ color: 0x52431c })
+
+        // Draw the connectors
+        .rect(containerWidth + edgeExcess / 2, -connectorOffsetY - connectorHeight, connectorWidth, connectorHeight)
+        .rect(
+            containerWidth + edgeExcess / 2,
+            -connectorOffsetY - connectorHeight * 2 - connectorGap,
+            connectorWidth,
+            connectorHeight,
+        )
+        .fill({ color: 0x121212 });
+
+    const wheelRadius = 35;
+    const wheelGap = 40;
+    const centerX = (containerWidth + edgeExcess) / 2;
+    const offsetX = wheelRadius + wheelGap / 2;
+
+    const backWheel = createTrainWheel(wheelRadius);
+    const frontWheel = createTrainWheel(wheelRadius);
+
+    backWheel.x = centerX - offsetX;
+    frontWheel.x = centerX + offsetX;
+    frontWheel.y = backWheel.y = 25;
+
+    container.addChild(graphics, backWheel, frontWheel);
+
+    app.ticker.add((time) => {
+        const dr = time.deltaTime * 0.15;
+
+        backWheel.rotation += dr;
+        frontWheel.rotation += dr;
+    });
+
+    return container;
 }
